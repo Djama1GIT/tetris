@@ -2,7 +2,7 @@ from tetris.field import Tetris
 
 tetris = Tetris()
 
-while True:
-    next(tetris)
+while next(tetris).game:
     print(tetris)
     print()
+

@@ -1,9 +1,14 @@
 from abc import ABC, abstractmethod
+from random import randint
 
 
 class Figure(ABC):
+    __count = 0
+
     def __init__(self):
         self.pos = self.xyz
+        Figure.__count += 1
+        self.color = Figure.__count
 
     @property
     @abstractmethod
@@ -95,5 +100,3 @@ class S(Figure):
             (1, 0), (1, 1),
         ]
 
-
-print(O().rotate(0))
