@@ -6,3 +6,4 @@ while next(tetris).game:
     print(tetris)
     print()
 
+

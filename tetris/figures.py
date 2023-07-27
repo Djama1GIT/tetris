@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from random import randint
+import numpy as np
 
 
 class Figure(ABC):
@@ -15,7 +15,7 @@ class Figure(ABC):
     def xyz(self) -> list[tuple]:
         raise NotImplementedError
 
-    def rotate(self, way: int) -> list[tuple]:
+    def rotate(self, way: int) -> np.array:
         match way:
             case 0:
                 # 0 degrees
@@ -31,6 +31,7 @@ class Figure(ABC):
                 # 270 degrees
                 maximum_x = max([x for x, y in self.xyz])
                 self.pos = [(y, maximum_x - x) for x, y in self.xyz]
+        self.pos = np.array(list(zip(*self.pos)))
         return self.pos
 
 
@@ -58,8 +59,8 @@ class J(Figure):
     @property
     def xyz(self):
         return [
-                    (0, 1),
-                    (1, 1),
+            (0, 1),
+            (1, 1),
             (2, 0), (2, 1),
         ]
 
@@ -79,7 +80,7 @@ class Z(Figure):
     def xyz(self):
         return [
             (0, 0), (0, 1),
-                    (1, 1), (1, 2),
+            (1, 1), (1, 2),
         ]
 
 
@@ -87,7 +88,7 @@ class T(Figure):
     @property
     def xyz(self):
         return [
-                    (0, 1),
+            (0, 1),
             (1, 0), (1, 1), (1, 2),
         ]
 
@@ -96,7 +97,6 @@ class S(Figure):
     @property
     def xyz(self):
         return [
-                    (0, 1), (0, 2),
+            (0, 1), (0, 2),
             (1, 0), (1, 1),
         ]
-

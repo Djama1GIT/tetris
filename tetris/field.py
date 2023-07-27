@@ -1,6 +1,6 @@
 import random
 import numpy as np
-from tetris.figures import O, I, J, L, Z, T, S
+from tetris.figures import Figure, O, I, J, L, Z, T, S
 
 
 class Tetris:
@@ -11,13 +11,13 @@ class Tetris:
     GAME_OVER_MESSAGE = "Game over! Your score: {0}"
 
     def __init__(self):
-        self.window = np.empty(Tetris.WINDOW, dtype=object)
+        self.window: np.array = np.empty(Tetris.WINDOW, dtype=object)
         self.window[:] = Tetris.EMPTY
-        self.game = True
+        self.game: bool = True
 
-        self.figure = None
-        self.figure_xs = None
-        self.figure_ys = None
+        self.figure: Figure = None
+        self.figure_xs: np.array = None
+        self.figure_ys: np.array = None
         self.figures_colors = set()
 
         self.put_new_figure()
@@ -30,27 +30,41 @@ class Tetris:
     def __next__(self):
         if np.any(
                 self.figure_ys == self.WINDOW[0] - 1) or np.any(
-            (self.window[self.figure_ys + 1, self.figure_xs] != Tetris.EMPTY) &
-            (self.window[self.figure_ys + 1, self.figure_xs] != self.figure.color)
-        ):  # Other figure (collision)
+            ((__elems_below_than_figure := self.window[self.figure_ys + 1, self.figure_xs]) != Tetris.EMPTY) &
+            (__elems_below_than_figure != self.figure.color)
+        ):
             self.put_new_figure()
         self.window[self.window == self.figure.color] = Tetris.EMPTY
         self.figure_ys += 1
         self.window[self.figure_ys, self.figure_xs] = self.figure.color
         return self
 
-    def put_new_figure(self):
+    def put_new_figure(self) -> None:
         self.figure = random.choice(self.figures)()
         self.figure.pos = self.figure.rotate(random.randint(0, 4))
         self.figures_colors.add(self.figure.color)
 
-        self.figure_xs, self.figure_ys = np.array(list(zip(*self.figure.pos)))
+        self.figure_xs, self.figure_ys = self.figure.pos
         self.figure_xs += 4
-        self.figure_ys += 1
 
         if any(self.window[self.figure_ys, self.figure_xs] != Tetris.EMPTY):
             self.game_over()
 
-    def game_over(self):
+    def event(self, _event):
+        match _event:
+            case "LEFT":
+                if np.all(self.figure_xs > 0):
+                    self.figure_xs -= 1
+            case "RIGHT":
+                if np.all(self.figure_xs < Tetris.WINDOW[1] - 1):
+                    self.figure_xs += 1
+            case "ROTATE_CCW":
+                print(self.figure.rotate(1))
+                self.figure_xs, self.figure_ys = self.figure.pos
+            case "ROTATE_CW":
+                print(self.figure.rotate(2))
+                self.figure_xs, self.figure_ys = self.figure.pos
+
+    def game_over(self) -> None:
         self.game = False
         print(Tetris.GAME_OVER_MESSAGE.format(self.score))
