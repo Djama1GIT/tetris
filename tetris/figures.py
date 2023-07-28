@@ -1,4 +1,4 @@
-from abc import ABC, abstractmethod
+from abc import ABC
 import numpy as np
 
 
@@ -6,97 +6,75 @@ class Figure(ABC):
     __count = 0
 
     def __init__(self):
-        self.pos = self.xyz
+        self.xyz = None
+        self._xyz = None
         Figure.__count += 1
         self.color = Figure.__count
+        self._rotate = 0
 
-    @property
-    @abstractmethod
-    def xyz(self) -> list[tuple]:
-        raise NotImplementedError
+    def rotate(self, way: int, param) -> np.array:
+        self._rotate += way
 
-    def rotate(self, way: int) -> np.array:
-        match way:
-            case 0:
-                # 0 degrees
-                self.pos = self.xyz
-            case 1:
-                # 90 degrees
-                self.pos = [(x, y) for y, x in self.xyz]
-            case 2:
-                # 180 degrees
-                maximum_y = max([y for y, x in self.xyz])
-                self.pos = [(maximum_y - y, x) for y, x in self.xyz]
-            case 3:
-                # 270 degrees
-                maximum_x = max([x for x, y in self.xyz])
-                self.pos = [(y, maximum_x - x) for x, y in self.xyz]
-        self.pos = np.array(list(zip(*self.pos)))
-        return self.pos
+        self._rotate %= len(self._xyz)
+        self.xyz = self._xyz[self._rotate]
+        param = np.array(self.xyz[0]), np.array(self.xyz[1])
+        return param
 
 
 class O(Figure):
-    @property
-    def xyz(self):
-        return [
-            (0, 0), (0, 1),
-            (1, 0), (1, 1)
-        ]
+    def __init__(self):
+        super().__init__()
+        self._xyz = (((0, 0, 1, 1), (0, 1, 0, 1)),)
+
+    def rotate(self, way: int, param) -> np.array:
+        # Не поворачиваем фигуру O
+        self.xyz = self._xyz[self._rotate]
+        return np.array(self.xyz[0]), np.array(self.xyz[1])
 
 
 class I(Figure):
-    @property
-    def xyz(self):
-        return [
-            (0, 0),
-            (1, 0),
-            (2, 0),
-            (3, 0),
-        ]
+    def __init__(self):
+        super().__init__()
+        self._xyz = (((0, 1, 2, 3), (0, 0, 0, 0)),
+                     ((0, 0, 0, 0), (0, 1, 2, 3)))
 
 
 class J(Figure):
-    @property
-    def xyz(self):
-        return [
-            (0, 1),
-            (1, 1),
-            (2, 0), (2, 1),
-        ]
+    def __init__(self):
+        super().__init__()
+        self._xyz = (((0, 1, 2, 2), (1, 1, 0, 1)),
+                     ((1, 1, 1, 0), (0, 1, 2, 0)),
+                     ((0, 0, 1, 2), (0, 1, 0, 0)),
+                     ((0, 0, 0, 1), (0, 1, 2, 2)))
 
 
 class L(Figure):
-    @property
-    def xyz(self):
-        return [
-            (0, 0),
-            (1, 0),
-            (2, 0), (2, 1),
-        ]
-
-
-class Z(Figure):
-    @property
-    def xyz(self):
-        return [
-            (0, 0), (0, 1),
-            (1, 1), (1, 2),
-        ]
+    def __init__(self):
+        super().__init__()
+        self._xyz = (((0, 1, 2, 2), (0, 0, 0, 1)),
+                     ((1, 1, 1, 0), (0, 1, 2, 2)),
+                     ((0, 0, 1, 2), (0, 1, 1, 1)),
+                     ((0, 0, 0, 1), (0, 1, 2, 0)))
 
 
 class T(Figure):
-    @property
-    def xyz(self):
-        return [
-            (0, 1),
-            (1, 0), (1, 1), (1, 2),
-        ]
+    def __init__(self):
+        super().__init__()
+        self._xyz = (((0, 1, 1, 1), (1, 0, 1, 2)),
+                     ((1, 0, 1, 2), (0, 1, 1, 1)),
+                     ((0, 0, 0, 1), (0, 1, 2, 1)),
+                     ((0, 1, 2, 1), (0, 0, 0, 1)))
+
+
+class Z(Figure):
+    def __init__(self):
+        super().__init__()
+        self._xyz = (((0, 0, 1, 1), (0, 1, 1, 2)),
+                     ((1, 2, 0, 1), (0, 0, 1, 1)))
 
 
 class S(Figure):
-    @property
-    def xyz(self):
-        return [
-            (0, 1), (0, 2),
-            (1, 0), (1, 1),
-        ]
+    def __init__(self):
+        super().__init__()
+        self._xyz = (((1, 1, 0, 0), (0, 1, 1, 2)),
+                     ((0, 1, 1, 2), (0, 0, 1, 1)))

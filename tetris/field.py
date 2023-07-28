@@ -41,10 +41,10 @@ class Tetris:
 
     def put_new_figure(self) -> None:
         self.figure = random.choice(self.figures)()
-        self.figure.pos = self.figure.rotate(random.randint(0, 4))
         self.figures_colors.add(self.figure.color)
-
-        self.figure_xs, self.figure_ys = self.figure.pos
+        self.figure_xs, self.figure_ys = self.figure.rotate(random.choice((-1, 1)), param=self.figure.xyz)
+        for i in range(random.randint(1, 4)):
+            self.figure.rotate(-1, param=(self.figure_xs, self.figure_ys))
         self.figure_xs += 4
 
         if any(self.window[self.figure_ys, self.figure_xs] != Tetris.EMPTY):
@@ -59,11 +59,9 @@ class Tetris:
                 if np.all(self.figure_xs < Tetris.WINDOW[1] - 1):
                     self.figure_xs += 1
             case "ROTATE_CCW":
-                print(self.figure.rotate(1))
-                self.figure_xs, self.figure_ys = self.figure.pos
+                self.figure_xs, self.figure_ys = self.figure.rotate(-1, param=(self.figure_xs, self.figure_ys))
             case "ROTATE_CW":
-                print(self.figure.rotate(2))
-                self.figure_xs, self.figure_ys = self.figure.pos
+                self.figure_xs, self.figure_ys = self.figure.rotate(1, param=(self.figure_xs, self.figure_ys))
 
     def game_over(self) -> None:
         self.game = False
