@@ -20,7 +20,6 @@ class Tetris:
         self.figure: Figure = None
         self.figure_xs: np.array = None
         self.figure_ys: np.array = None
-        self.figures_colors = set()
 
         self.put_new_figure()
 
@@ -42,7 +41,6 @@ class Tetris:
 
     def put_new_figure(self) -> None:
         self.figure = random.choice(self.figures)()
-        self.figures_colors.add(self.figure.number_of_color)
         self.figure_xs, self.figure_ys = self.figure.rotate(random.choice((-1, 1)))
 
         for i in range(random.randint(1, 4)):
@@ -97,22 +95,27 @@ class Tetris:
             self.figure_xs += direction
 
     def rotate(self, direction):
-        # TODO: the figure should not rotate if a part of another figure is destroyed at the same time.
-        _y = np.min(self.figure_ys)
-        _x = np.min(self.figure_xs)
+        offset_y = np.min(self.figure_ys)
+        offset_x = np.min(self.figure_xs)
 
-        self.figure_xs, self.figure_ys = self.figure.rotate(direction)
-        self.figure_xs += _x
-        self.figure_ys += _y
+        figure_xs, figure_ys = self.figure.rotate(direction)
+        figure_xs += offset_x
+        figure_ys += offset_y
 
-        if np.any(self.figure_xs < 1):
-            self.figure_xs -= np.min(self.figure_xs)
-        if np.any(self.figure_xs >= self.WINDOW[1]):
-            self.figure_xs -= np.max(self.figure_xs) - self.WINDOW[1] + 1
+        if np.any(figure_xs < 1):
+            figure_xs -= np.min(figure_xs)
+        if np.any(figure_xs >= self.WINDOW[1]):
+            figure_xs -= np.max(figure_xs) - self.WINDOW[1] + 1
+        if np.any(figure_ys >= self.WINDOW[0]):
+            figure_xs -= np.max(figure_ys) - self.WINDOW[0] + 1
+        if np.all(((_ := self.window[figure_ys, figure_xs]) == self.EMPTY) | (_ == self.figure.number_of_color)):
+            self.figure_ys, self.figure_xs = figure_ys, figure_xs
 
     def switch_AI(self):
         self.AI_color = RED if self.AI_color == GREEN else GREEN
         # TODO: Connect an AI that will play by itself
+        # The project has been abandoned until better times
+        return True if self.AI_color is GREEN else False
 
     def game_over(self) -> None:
         self.game = False

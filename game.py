@@ -77,11 +77,15 @@ while flag:
                         tick_counter = -30
                     case pygame.K_a:
                         tetris.event("SWITCH_AI")
+                    case pygame.K_r:
+                        tetris = Tetris()
+                        tick_counter = 0
+                        continue
     if tetris.game and flag and tick_counter % 2 == 0:
         next(tetris)
         pygame.display.update()
 
-    if tick_counter > 0:
-        temp_FPS = FPS
+    if tick_counter % 100 == 0:
+        temp_FPS = FPS + tetris.score // 100
 
     tick_counter += 1
