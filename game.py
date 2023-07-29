@@ -38,18 +38,23 @@ def draw_window():
             draw_xy(x, y, COLORS[(START_FIGURE_COLOR + vx) % len(COLORS)]) if vx else draw_xy(x, y, (0, 0, 0))
 
 
-pygame.draw.line(surface, GRAY, (REAL_WINDOW_SIZE[0] + 5, 0), REAL_WINDOW_SIZE)
+pygame.draw.line(surface, GRAY, (REAL_WINDOW_SIZE[0] + 5, 0), (REAL_WINDOW_SIZE[0] + 5, REAL_WINDOW_SIZE[1]))
 pygame.display.update()
 
 clock = pygame.time.Clock()
 
 flag = True
+tick_counter = 0
+temp_FPS = FPS
 while flag:
-    clock.tick(FPS)
+    clock.tick(temp_FPS)
     draw_window()
 
-    pygame.draw.rect(surface, BLACK, (REAL_WINDOW_SIZE[0] + 10, 0, *REAL_WINDOW_SIZE))
-    draw_text("Your|Score:||{1}{0}".format(tetris.score, " " * (6 - len(str(tetris.score)))))
+    pygame.draw.rect(surface, BLACK, (
+        REAL_WINDOW_SIZE[0] + 10, 0,
+        REAL_WINDOW_SIZE[0] + 10, REAL_WINDOW_SIZE[1])
+                     )
+    draw_text(f"Your|Score:||{tetris.score: >6}")
     draw_text("AI||", color=RED, size=60, up=False)
 
     for event in pygame.event.get():
@@ -67,8 +72,14 @@ while flag:
                         tetris.event("ROTATE_CCW")
                     case pygame.K_DOWN:
                         tetris.event("ROTATE_CW")
-    if tetris.game and flag:
+                    case pygame.K_SPACE:
+                        temp_FPS = 30
+                        tick_counter = -30
+    if tetris.game and flag and tick_counter % 2 == 0:
         next(tetris)
         pygame.display.update()
 
+    if tick_counter > 0:
+        temp_FPS = FPS
 
+    tick_counter += 1

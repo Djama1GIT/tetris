@@ -1,4 +1,4 @@
-FPS = 5
+FPS = 4
 IN_PX = 40
 REAL_WINDOW_SIZE = (10 * IN_PX, 20 * IN_PX)
 WINDOW_SIZE = (15 * IN_PX, 20 * IN_PX)
@@ -26,7 +26,6 @@ COLORS = [
     (240, 255, 255),  # Azure
     (245, 245, 220),  # Beige
     (255, 228, 196),  # Bisque
-    (0, 0, 0),  # Black
     (255, 235, 205),  # BlanchedAlmond
     (0, 0, 255),  # Blue
     (138, 43, 226),  # BlueViolet
