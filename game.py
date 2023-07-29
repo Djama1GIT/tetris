@@ -2,7 +2,7 @@ import random
 
 import pygame
 
-from tetris.consts import COLORS, FPS, IN_PX, REAL_WINDOW_SIZE, WINDOW_SIZE, WHITE, BLACK, YELLOW, RED, GREEN, GRAY
+from tetris.consts import COLORS, FPS, IN_PX, REAL_WINDOW_SIZE, WINDOW_SIZE, WHITE, BLACK, YELLOW, GRAY
 from tetris.field import Tetris
 
 pygame.init()
@@ -55,7 +55,7 @@ while flag:
         REAL_WINDOW_SIZE[0] + 10, REAL_WINDOW_SIZE[1])
                      )
     draw_text(f"Your|Score:||{tetris.score: >6}")
-    draw_text("AI||", color=RED, size=60, up=False)
+    draw_text("AI||", color=tetris.AI_color, size=60, up=False)
 
     for event in pygame.event.get():
         match event.type:
@@ -75,6 +75,8 @@ while flag:
                     case pygame.K_SPACE:
                         temp_FPS = 30
                         tick_counter = -30
+                    case pygame.K_a:
+                        tetris.event("SWITCH_AI")
     if tetris.game and flag and tick_counter % 2 == 0:
         next(tetris)
         pygame.display.update()

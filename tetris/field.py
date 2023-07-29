@@ -1,5 +1,6 @@
 import random
 import numpy as np
+from tetris.consts import RED, GREEN
 from tetris.figures import Figure, O, I, J, L, Z, T, S
 
 
@@ -14,6 +15,7 @@ class Tetris:
         self.window: np.array = np.empty(Tetris.WINDOW, dtype=object)
         self.window[:] = Tetris.EMPTY
         self.game: bool = True
+        self.AI_color: tuple[int, int, int] = RED
 
         self.figure: Figure = None
         self.figure_xs: np.array = None
@@ -30,18 +32,17 @@ class Tetris:
     def __next__(self):
         if np.any(self.figure_ys == self.WINDOW[0] - 1) or np.any(
                 ((elems_below_than_figure := self.window[self.figure_ys + 1, self.figure_xs]) != Tetris.EMPTY) &
-                (elems_below_than_figure != self.figure.color)
+                (elems_below_than_figure != self.figure.number_of_color)
         ):
             self.put_new_figure()
             self.check_rows()
-            self.update(False)
         else:
             self.update(True)
         return self
 
     def put_new_figure(self) -> None:
         self.figure = random.choice(self.figures)()
-        self.figures_colors.add(self.figure.color)
+        self.figures_colors.add(self.figure.number_of_color)
         self.figure_xs, self.figure_ys = self.figure.rotate(random.choice((-1, 1)))
 
         for i in range(random.randint(1, 4)):
@@ -57,12 +58,6 @@ class Tetris:
                 self.score += i
                 self.window[1:i + 1] = self.window[:i]
 
-    def update(self, _update_y=False):
-        self.window[self.window == self.figure.color] = Tetris.EMPTY
-        if _update_y:
-            self.figure_ys += 1
-        self.window[self.figure_ys, self.figure_xs] = self.figure.color
-
     def event(self, _event):
         match _event:
             case "LEFT":
@@ -73,6 +68,15 @@ class Tetris:
                 self.rotate(-1)
             case "ROTATE_CCW":
                 self.rotate(1)
+            case "SWITCH_AI":
+                self.switch_AI()
+        self.update(False)
+
+    def update(self, _update_y=False):
+        self.window[self.window == self.figure.number_of_color] = Tetris.EMPTY
+        if _update_y:
+            self.figure_ys += 1
+        self.window[self.figure_ys, self.figure_xs] = self.figure.number_of_color
 
     def move(self, direction):
         wall = (np.all(self.figure_xs < Tetris.WINDOW[1] - 1) and
@@ -85,15 +89,15 @@ class Tetris:
             figure1 = (__direction := self.window[
                 self.figure_ys, self.figure_xs + direction
             ]) == Tetris.EMPTY
-            figure2 = __direction == self.figure.color
+            figure2 = __direction == self.figure.number_of_color
 
             figure = np.all(figure1 | figure2)
 
         if wall and figure:
             self.figure_xs += direction
-            self.update(False)
 
     def rotate(self, direction):
+        # TODO: the figure should not rotate if a part of another figure is destroyed at the same time.
         _y = np.min(self.figure_ys)
         _x = np.min(self.figure_xs)
 
@@ -105,6 +109,10 @@ class Tetris:
             self.figure_xs -= np.min(self.figure_xs)
         if np.any(self.figure_xs >= self.WINDOW[1]):
             self.figure_xs -= np.max(self.figure_xs) - self.WINDOW[1] + 1
+
+    def switch_AI(self):
+        self.AI_color = RED if self.AI_color == GREEN else GREEN
+        # TODO: Connect an AI that will play by itself
 
     def game_over(self) -> None:
         self.game = False

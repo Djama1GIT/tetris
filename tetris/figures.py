@@ -9,7 +9,7 @@ class Figure(ABC):
         self.xyz = None
         self._xyz = None
         Figure.__count += 1
-        self.color = Figure.__count
+        self.number_of_color = Figure.__count
         self._rotate = 0
 
     def rotate(self, way: int) -> np.array:
@@ -27,7 +27,6 @@ class O(Figure):
         self._xyz = (((0, 0, 1, 1), (0, 1, 0, 1)),)
 
     def rotate(self, way: int) -> np.array:
-        # Не поворачиваем фигуру O
         self.xyz = self._xyz[self._rotate]
         return np.array(self.xyz[0]), np.array(self.xyz[1])
 
